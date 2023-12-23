@@ -1,0 +1,25 @@
+Project project_name {
+    database_type: 'PostgreSQL'
+    Note: 'Description of the project'
+}
+
+Table public.Member {
+    id serial [pk, unique, not null, note: 'primary key!']
+    address varchar(255) [unique, not null, note: 'address!']
+    hieght decimal(1_20) [not null, note: 'hieght!']
+}
+
+Table public.Club {
+    id serial [pk, unique, not null, note: 'primary key!']
+    name varchar(100) [unique, not null, note: 'Club name!']
+}
+
+Table public.Club_Member_Map {
+    id decimal [pk, unique, not null, note: 'primary key!']
+    club_id serial [not null, note: 'club id!']
+    member_id serial [not null, note: 'member id!']
+}
+
+Ref: public.Member.id < public.Club_Member_Map.member_id
+
+Ref: public.Club.id < public.Club_Member_Map.club_id
