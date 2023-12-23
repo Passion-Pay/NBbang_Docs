@@ -1,0 +1,98 @@
+Project NBbang {
+    database_type: 'PostgreSQL'
+    Note: 'NBbang 프로젝트 ERD'
+}
+
+Table public.USER {
+    id serial [pk, unique, not null, note: '유저의 PK']
+    oauth_type enum [not null, default:null, note: 'oAuth 로그인 타입']
+    name varchar(15) [not null, note: "유저의 이름"]
+    phone_num varchar(15) [not null, note: "유저의 연락처"]
+    user_type enum [not null, default:USER, note: '유저의 역할 (유저, 관리자, 어드민)']
+}
+
+Table public.Account {
+    id serial [pk, unique, not null, note: '계좌의 PK']
+    user_id serial [fk, not null, note: '계좌의 주인']
+    account_num varchar(20) [not null, note: '계좌번호']
+    bank_name varchar(30) [not null, note: '은행 이름']
+    suspend boolean [not null, default:False, note: '정지 여부']
+    suspend_id serial [note: '정지 ID']
+    deleted boolean [not null, default:False, note: '삭제 여부']
+    verfied boolean [not null, default:False, note: '실명 인증']
+    created_date timestamp [not null, default:now(), note: '생성 시간']
+    updated_date timestamp [not null, default:now(), note: '수정 시간']
+}
+
+Table public.Transaction {
+    id serial [pk, unique, not null, note: 'Transaction의 PK']
+    sender_id serial [not null, note: '입금자의 ID']
+    receiver_id serial [not null, note: '예금주의 ID']
+    sender_account_id serial [not null, note: '입금자의 계좌 ID']
+    receiver_account_id serial [not null, note: '예금주의 계좌 ID']
+    status enum [not null, note: '현재 트랜잭션의 상태 (입금 대기중, 입금 완료)']
+    created_date timestamp [not null, default:now(), note:'생성 시간']
+    updated_date timestamp [not null, default:now(), note:'수정 시간'] 
+}
+
+Table public.RECEIPT_Ticket {
+    id serial [pk, unique, not null, note: '영수증_티켓의 PK']
+    created_date timestamp [not null, default:now(), note: '영수증_티켓의 생성일자']
+    updated_date timestamp [not null, default:now(), note: '영수증_티켓의 수정일자']
+    Note: '영수증_티켓 테이블 (개별 정산 정보를 담으려면 어떻게 해야할 지 적어보기...)'
+}
+
+Table public.Receipt {
+    id serial [pk, unique, not null, note: '영수증의 PK']
+    create_user_id [not null, note: '티켓을 생성한 유저의 ID']
+    money_round enum [not null, default:BY1000, note: "돈 절삭 단위 (10원 단위, 100원 단위, 1000원 단위, 10000원 단위)"]
+}
+
+Table public.Receipt_Ticket_User_Map {
+    id serial [pk, unique, not null, note: '영수증_티켓_유저_맵의 PK']
+    reciept_id serial [not null, note: '영수증의 ID']
+    reciept_ticket_id serial [not null, note: '영수증_티켓의 ID']
+    user_id [not null, note: '영수증_티켓에 참여하는 유저의 ID']
+}
+
+Table public.Group {
+    id serial [pk, unique, not null, note: '그룹의 PK']
+    name varchar(30) [unique, not null, note: '그룹 이름']
+    member_count decimal [not null, note: '그룹의 가입자 수']
+    member_admin serial [fk, not null, note: '그룹의 관리자']
+    created_date timestamp [not null, default:now(), note: '그룹 생성일']
+    updated_date timestamp [not null, default:now(), note: '그룹 수정일']
+    visibility boolean [not null, default:True, note: '공개 여부']
+    registration_type enum [not null, default:APPLY, note: '그룹의 가입 방법 (신청가능, 초대만)']
+    suspend enum [not null, default:NULL, note: '그룹 정지 여부 (없음, 기간 정지, 영구 정지)']
+    deleted boolean [not null, default:False, note: '삭제 여부']
+    suspend_id serial [note: '정지 ID']
+}
+
+Table public.USER_Group_Map {
+    id serial [pk, unique, not null, note: '유저, 그룹 매핑 테이블 PK']
+    user_id serial [fk, not null, note: '유저의 ID']
+    group_id serial [fk, not null, note: '그룹의 ID']
+    created_date timestamp [not null, default:now(), note: '그룹 가입 일자']
+    updated_date timestamp [not null, default:now(), note: '유저의 그룹 상태 최종 수정일자']
+    deletd boolean [not null, default:False, note: '삭제 여부']
+    status enum [not null, note: '현재 그룹의 가입 상태 (가입 중, 정지, 탈퇴, 강퇴)']
+    rank enum [not null, default:USER, note: '그룹에서의 랭크 (일반 유저, 운영진, 관리자)']
+}
+
+Table public.Suspend {
+    id serial [pk, unique, not null, note: '정지 ID']
+    ref_type enum [not null, default:USER, note: '정지를 참조하는 타입 (유저, 그룹)']
+    ref_id serial [not null, note: '정지 참조의 ID']
+    sus_type enum [not null, default:DURATION, note: '정지 타입 (기간 정지, 영구 정지)']
+    manager_id serial [not null, note: '정지 처분을 내린 유저의 ID']
+    created_date timestamp [not null, default:now(), note: '정지 처분 생성 날짜']
+    updated_date timestamp [not null, default:now(), note: '정지 처분 수정 날짜']
+    duration timestamp [not null, note: '정지 기간']
+    suspend_start timestamp [not null, default:now(), note: '정지 처분 시작 일자']
+    suspend_end timestamp [not null, default:now()+duration, note: '정지 처분 종료 일자']
+}
+
+Ref: public.Member.id < public.Club_Member_Map.member_id
+
+Ref: public.Club.id < public.Club_Member_Map.club_id
