@@ -48,28 +48,6 @@ enum TRANSACTION_TYPE {
     "TRANSFER_CONFIRMED" [note: '입금 완료']
 }
 
-// Table public.Receipt_Ticket {
-//     id serial [pk, unique, not null, note: '영수증_티켓의 PK']
-//     receipt_id serial [not null, note: '영수증 ID']
-//     user_id serial [not null, note: '유저 ID']
-//     created_date timestamp [not null, default:now(), note: '영수증_티켓의 생성일자']
-//     updated_date timestamp [not null, default:now(), note: '영수증_티켓의 수정일자']
-//     Note: '영수증_티켓 테이블 (NO_SQL)'
-// }
-
-// Table public.Receipt {
-//     id serial [pk, unique, not null, note: '영수증의 PK']
-//     create_user_id [not null, note: '티켓을 생성한 유저의 ID']
-//     money_round enum [not null, default:BY1000, note: '돈 절삭 단위 (10원 단위, 100원 단위, 1000원 단위, 10000원 단위)']
-// }
-
-// Table public.Receipt_Ticket_User_Map {
-//     id serial [pk, unique, not null, note: '영수증_티켓_유저_맵의 PK']
-//     reciept_id serial [not null, note: '영수증의 ID']
-//     reciept_ticket_id serial [not null, note: '영수증_티켓의 ID']
-//     user_id [not null, note: '영수증_티켓에 참여하는 유저의 ID']
-// }
-
 Table public.GROUP {
     id serial [pk, unique, not null, note: '그룹의 PK']
     name varchar(30) [unique, not null, note: '그룹 이름']
